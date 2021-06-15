@@ -4,34 +4,38 @@ import Profile from './components/Profile/Profile'
 
 const App = () => {
     const [students, setStudents] = useState([]);
-    const [tags, setTags] = useState([]);
-    const [search, setSearch] = useState([]);
+    const [nameSearch, setNameSearch] = useState([]);
+    const [tagSearch, setTagSearch] = useState([]);
     useEffect(() => {
         fetch('https://api.hatchways.io/assessment/students')
         .then(response => response.json())
         .then(data => {
             setStudents(data.students);
-            console.log(students);
         });
     }, [])
+    
     const handleAddTag = (event, id) => {
         if (event.key === "Enter" && event.target.value !== "") {
-            setTags([...tags, event.target.value]);
+            setStudents(students.map((row, i) => {
+                if (row.id === id) {
+                    let newTag = row.tags ? [...row.tags] : [];
+                    return {
+                        ...row, tags: [...newTag, event.target.value]
+                    };
+                } else {
+                    return row;
+                }
+            }));
             event.target.value = "";
-            const stags = students.find(item => item.id === id);
-            console.log(stags);
-            setStudents([...students, tags]);
         }
-    }
-    
-    console.log(students);
-    // console.log(tags);
+    };
     const handleNameSearch = (event) => {
-        setSearch(event.target.value);
+        setNameSearch(event.target.value);
     }
     const handleTagSearch = (event) => {
-
+        setTagSearch(event.target.value);
     }
+    console.log(students);
     return (
         <div className="parent">
             <div className="child border" style={{borderRadius: "10px"}}>
@@ -40,9 +44,11 @@ const App = () => {
                     <input type="search" placeholder='Search By tag' onChange={handleTagSearch} />
                 </div>
                 {students.filter((value) => {
-                    if (search == '') {
+                    if (nameSearch == '') {
+                        console.log(value);
                         return value;
-                    } else if (value.firstName.toLowerCase().includes(search.toLowerCase())||value.lastName.toLowerCase().includes(search.toLowerCase())){
+                    } else if (value.firstName.toLowerCase().includes(nameSearch.toLowerCase()) || value.lastName.toLowerCase().includes(nameSearch.toLowerCase())) {
+                        console.log(value);
                         return value;
                     }
                 }).map((data) => (
